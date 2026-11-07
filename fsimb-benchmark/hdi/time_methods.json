@@ -1,0 +1,110 @@
+{
+ "alon": {
+  "n_train": 49,
+  "p": 2000,
+  "times": {
+   "filter/embedded:H": 0.00836695999987569,
+   "filter/embedded:F": 0.002354422000280465,
+   "filter/embedded:L1": 0.062705244999961,
+   "filter/embedded:EN": 2.9587352170001395,
+   "filter/embedded:mRMR": 0.23172038099983183,
+   "filter/embedded:RFimp": 0.894543464999515,
+   "filter/embedded:RFperm": 6.546137325000018,
+   "wrapper:BGWO 5-NN cap 20": 0.5638200419998611,
+   "wrapper:BGWO 5-NN no cap": 0.5288867419994858,
+   "wrapper:BGWO ridge cap 20": 0.48831653500019456,
+   "wrapper:EMT 3 tasks": 0.6398454090003725,
+   "filter/embedded:sssHD": 84.06087354700139
+  }
+ },
+ "gravier": {
+  "n_train": 134,
+  "p": 2905,
+  "times": {
+   "filter/embedded:H": 0.03601562899984856,
+   "filter/embedded:F": 0.0036651259997597663,
+   "filter/embedded:L1": 0.11109528500037413,
+   "filter/embedded:EN": 5.1554500409993125,
+   "filter/embedded:mRMR": 0.2760926600003586,
+   "filter/embedded:RFimp": 1.4329576299996916,
+   "filter/embedded:RFperm": 6.984372013999746,
+   "wrapper:BGWO 5-NN cap 20": 1.2984493539997857,
+   "wrapper:BGWO 5-NN no cap": 1.4161646740003562,
+   "wrapper:BGWO ridge cap 20": 1.9428024979997645,
+   "wrapper:EMT 3 tasks": 1.358249447000162,
+   "filter/embedded:sssHD": 160.98137589100224
+  }
+ },
+ "PCMAC_ir5": {
+  "n_train": 192,
+  "p": 2423,
+  "times": {
+   "filter/embedded:H": 0.015661841000110144,
+   "filter/embedded:F": 0.004494042000260379,
+   "filter/embedded:L1": 0.08694328100045823,
+   "filter/embedded:EN": 3.534592915000758,
+   "filter/embedded:mRMR": 0.27157803699992655,
+   "filter/embedded:RFimp": 1.054353942000489,
+   "filter/embedded:RFperm": 6.791499087000375,
+   "wrapper:BGWO 5-NN cap 20": 1.8928713139994215,
+   "wrapper:BGWO 5-NN no cap": 2.216526187999989,
+   "wrapper:BGWO ridge cap 20": 3.9134505409992926,
+   "wrapper:EMT 3 tasks": 1.745927341999959,
+   "filter/embedded:sssHD": 29.886498431998916
+  }
+ },
+ "yeoh": {
+  "n_train": 198,
+  "p": 12625,
+  "times": {
+   "filter/embedded:H": 0.6754949830001351,
+   "filter/embedded:F": 0.02742588699948101,
+   "filter/embedded:L1": 2.471279830999265,
+   "filter/embedded:EN": 75.45042481400014,
+   "filter/embedded:mRMR": 0.629078782999386,
+   "filter/embedded:RFimp": 2.2175290239993046,
+   "filter/embedded:RFperm": 7.87674879000042,
+   "wrapper:BGWO 5-NN cap 20": 2.2446070090009016,
+   "wrapper:BGWO 5-NN no cap": 2.7980347640004766,
+   "wrapper:BGWO ridge cap 20": 4.895254312000361,
+   "wrapper:EMT 3 tasks": 2.8752891060003094,
+   "filter/embedded:sssHD": 82.68152407700109
+  }
+ },
+ "burczynski": {
+  "n_train": 101,
+  "p": 22283,
+  "times": {
+   "filter/embedded:H": 0.3532307400000718,
+   "filter/embedded:F": 0.02330966499994247,
+   "filter/embedded:L1": 1.467958813000223,
+   "filter/embedded:EN": 61.00938062200021,
+   "filter/embedded:mRMR": 0.6445004619999963,
+   "filter/embedded:RFimp": 2.2846431310008484,
+   "filter/embedded:RFperm": 8.014339352000206,
+   "wrapper:BGWO 5-NN cap 20": 1.445446732000164,
+   "wrapper:BGWO 5-NN no cap": 1.1679667239995979,
+   "wrapper:BGWO ridge cap 20": 1.5143912659996204,
+   "wrapper:EMT 3 tasks": 1.0664935989998412,
+   "filter/embedded:sssHD": 115.61889869399965
+  }
+ },
+ "sun": {
+  "n_train": 144,
+  "p": 54612,
+  "times": {
+   "filter/embedded:H": 2.1398726890001853,
+   "filter/embedded:F": 0.10998372999983985,
+   "filter/embedded:L1": 7.011662191999676,
+   "filter/embedded:EN": 223.6527236940001,
+   "filter/embedded:mRMR": 1.7274054480003542,
+   "filter/embedded:RFimp": 3.427951245999793,
+   "filter/embedded:RFperm": 8.616187793999416,
+   "wrapper:BGWO 5-NN cap 20": 3.295111901999917,
+   "wrapper:BGWO 5-NN no cap": 3.5720997839998745,
+   "wrapper:BGWO ridge cap 20": 4.392268992000027,
+   "wrapper:EMT 3 tasks": 3.763754854000581,
+   "filter/embedded:sssHD": 155.3384008510002
+  }
+ }
+}

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+data_raw/
+data/**/*.npz
+results_ssshd/_cache/
+*.log

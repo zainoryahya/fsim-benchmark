@@ -1,0 +1,19 @@
+name,kind,source,task,n,p,minority,majority,IR
+chowdary,natural,datamicroarray,colon vs rest,104,22283,42,62,1.48
+singh,natural,datamicroarray,Normal vs rest,102,12600,50,52,1.04
+west,natural,datamicroarray,positive vs rest,49,7129,24,25,1.04
+borovecki,natural,datamicroarray,control vs rest,31,22283,14,17,1.21
+khan,natural,datamicroarray,NB vs rest,63,2308,12,51,4.25
+nakayama,natural,datamicroarray,synovial sarcoma vs rest,105,22283,16,89,5.56
+su,natural,datamicroarray,4 vs rest,102,5565,23,79,3.43
+sun,natural,datamicroarray,non-tumor vs rest,180,54612,23,157,6.83
+orlraws10P,natural,scikit-feature,class 1 vs rest,100,10304,10,90,9.0
+pixraw10P,natural,scikit-feature,class 1 vs rest,100,10000,10,90,9.0
+warpAR10P,natural,scikit-feature,class 1 vs rest,130,2400,13,117,9.0
+warpPIE10P,natural,scikit-feature,class 1 vs rest,210,2420,21,189,9.0
+singh_ir5,controlled,mixed,subsampled to IR 5,60,12600,10,50,5.0
+chowdary_ir5,controlled,mixed,subsampled to IR 5,74,22283,12,62,5.17
+PCMAC_ir5,controlled,mixed,subsampled to IR 5,240,2423,40,200,5.0
+PCMAC_ir10,controlled,mixed,subsampled to IR 10,220,2363,20,200,10.0
+RELATHE_ir5,controlled,mixed,subsampled to IR 5,240,3549,40,200,5.0
+RELATHE_ir10,controlled,mixed,subsampled to IR 10,220,3495,20,200,10.0

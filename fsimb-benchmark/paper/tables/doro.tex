@@ -1,0 +1,7 @@
+P1a In-fold null MCC in $[-0.03, +0.03]$ & $-$0.013 to +0.014 & Met \\
+P1b SMOTE-before-CV null MCC $> +0.10$ & +0.560 to +0.795 & Met \\
+P1c Filter-before-CV null MCC $> +0.10$ & +0.000 to +0.383 (null AUC 0.63--0.78) & Met in 1 of 4 combinations; leak visible in AUC \\
+P2 $|$SMOTE $-$ prior threshold$|$ in G-mean $\le 0.02$ & SMOTE$\to$FS $-$0.020; FS$\to$SMOTE $-$0.006 & Met for FS$\to$SMOTE; SMOTE$\to$FS just outside (worse than the threshold) \\
+P3 Cap 20 $-$ \Hel{}20 on LR/SVM $< +0.02$ & $-$0.017 (caps 10/30/40: +0.004, +0.029, +0.030) & Met; at caps 30--40 (not registered) the wrapper was ahead \\
+P4 EMT (3 tasks) $-$ cap 20 (5-NN) $\le +0.02$ & $-$0.005 & Met \\
+P5 Wrapper stability $<$ filter stability & caps 0.21--0.26, EMT 0.16--0.19, filter 0.85--0.89 & Met \\
