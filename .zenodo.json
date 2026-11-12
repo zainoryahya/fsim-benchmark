@@ -1,0 +1,35 @@
+{
+  "title": "fsimb: code and results for \"Evaluating feature selection for high-dimensional imbalanced data: leakage, resampling, and the strength of simple minority-aware filters\"",
+  "upload_type": "software",
+  "description": "Code, result files and analysis scripts for a benchmark of feature selection on high-dimensional class-imbalanced data (34 discovery datasets, 18 pre-registered held-out datasets and Dorothea). Includes nested evaluation with label-permutation leakage runs, filters, embedded methods, wrappers, evolutionary multitasking, re-implementations of MF-CSO and sssHD, SVM-RFE, a genetic-algorithm wrapper and search-budget checks, and the scripts that rebuild every table and figure of the manuscript from the stored results.",
+  "creators": [
+    {
+      "name": "Yahya, Zainor Ridzuan",
+      "affiliation": "Universiti Malaysia Perlis (UniMAP)"
+    },
+    {
+      "name": "Balagem, Baraah Ali Omar",
+      "affiliation": "Universiti Malaysia Perlis (UniMAP)"
+    },
+    {
+      "name": "Wan Muhamad, Wan Zuki Azman",
+      "affiliation": "Universiti Malaysia Perlis (UniMAP)"
+    },
+    {
+      "name": "Abdul Khalib, Zahereel Ishwar",
+      "affiliation": "Universiti Malaysia Perlis (UniMAP)"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "feature selection",
+    "class imbalance",
+    "high-dimensional data",
+    "data leakage",
+    "threshold moving",
+    "wrapper methods",
+    "evolutionary multitasking",
+    "benchmark"
+  ],
+  "version": "v1.1"
+}
