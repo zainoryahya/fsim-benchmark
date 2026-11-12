@@ -48,9 +48,13 @@ github.com/jundongl/scikit-feature (gh-pages branch, files/datasets/) into `data
 | EMT (Table emt) | `run_emt.py` | `analyze_emt.py` |
 | MF-CSO (Table mfcso) | `R0=0 NREP=2 run_mfcso.py data/v2 results_mfcso` | `analyze_mfcso.py` |
 | sssHD | `run_ssshd.py data/v2 results_ssshd` (NREP=2, K_SUB=50) | `analyze_ssshd.py` |
+| SVM-RFE, all features, Hellinger tie-break variants (Table base) | `run_extra.py data/v2 results_extra` (NREP=5) | `analyze_extra.py` (run from the repository root) |
+| Further wrapper checks: GA, 4x budget, ANOVA-F pool, search-seed stability (Table wrap2) | `run_wrap2.py data/v2 results_wrap2` (`scripts/wrap2_queue.sh`) | `analyze_extra.py` |
+| Components, imbalance and text-task analyses (Supplementary) | (stored results) | `analyze_review.py` |
 | Held-out hypotheses (Table prereg) and sensitivity analysis | `hdi_ho/chain.sh` | `hdi_ho/analyze_ho.py`, `hdi_ho/sens_ho.py` |
 | Dorothea (Table doro) | `xqueue2.sh`, `hdi_ho/*_doro.py` | `hdi_ho/merge_doro.py`, `hdi_ho/analyze_doro.py`, `paper/make_doro.py` |
 | Run time (Table time) | `time_methods.py`, `time_ssshd.py` (one core, idle machine) | `paper/make_assets.py` |
+| Highlights and self-contained submission folder | | `paper/make_highlights.py`, `paper/make_submission.py` |
 
 Repeats 0-1 were run first and repeats 2-4 later with the `*_x.py` scripts (`xqueue.sh`, R0=2 NREP=3);
 `merge_x.py <suite dir>` merges them into the 5-repeat results (weighted means 2/5 and 3/5, subsets concatenated

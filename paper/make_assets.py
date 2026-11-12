@@ -1,6 +1,6 @@
 """Builds every table (tables/*.tex) and figure (figs/*.pdf) of the paper from the saved results.
 
-Discovery = hdi/ (34 non-ceiling sets), held-out = hdi_ho/ (18 sets).
+Discovery = /home/claude/hdi (34 non-ceiling sets), held-out = /home/claude/hdi_ho (18 sets).
 Primary outcome in the wrapper/filter results = mean(G-mean, (MCC+1)/2, AUC-PR) on pooled out-of-fold
 predictions; the leakage and threshold experiments report raw MCC (chance level 0).
 """
@@ -11,8 +11,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-D, H, OUT = f"{ROOT}/hdi", f"{ROOT}/hdi_ho", f"{ROOT}/paper"
+D, H, OUT = "/home/claude/hdi", "/home/claude/hdi_ho", "/home/claude/paper"
 os.makedirs(f"{OUT}/tables", exist_ok=True); os.makedirs(f"{OUT}/figs", exist_ok=True)
 CEILING = {"chiaretti", "CLL_SUB_111", "lymphoma", "Carcinom"}
 J = lambda p: json.load(open(p))
@@ -35,6 +34,8 @@ def paired(a, b):
 
 def f3(x, sign=False):
     x = round(float(x), 3) + 0.0          # avoid printing a negative zero
+    if sign and x == 0:
+        return "0.000"                    # no sign on a value that rounds to zero
     return (f"{x:+.3f}" if sign else f"{x:.3f}").replace("-", "$-$")
 
 
@@ -176,7 +177,7 @@ rows = []
 for i, m in enumerate(FD["measures"]):
     pm = FD["primary_mean"][i]
     best = max(FD["primary_mean"][j][e] for j in range(12) for e in range(4))
-    cs = [(r"\textbf{%.3f}" % v) if abs(v - best) < 1e-9 else f"{v:.3f}" for v in pm]
+    cs = [f"{v:.3f}" for v in pm]
     rows.append(f"{MNAME[m]} & " + " & ".join(cs) + f" & {rD[m]:.1f} & {rH[m]:.1f} \\\\")
 open(f"{OUT}/tables/fid.tex", "w").write("\n".join(rows) + "\n")
 facts["fid"] = dict(D_p=FD["friedman_measures_avg_over_estimators"]["p"], H_p=FH["friedman_measures_avg_over_estimators"]["p"],
@@ -186,7 +187,7 @@ facts["fid"] = dict(D_p=FD["friedman_measures_avg_over_estimators"]["p"], H_p=FH
 E = {"D": J(f"{D}/summary_emt.json"), "H": J(f"{H}/summary_emt.json")}
 CP = {"D": J(f"{D}/summary_cap.json"), "H": J(f"{H}/summary_cap.json")}
 ENAME = [("single", "Single-task BGWO, no cap"), ("cap20", "Single-task BGWO, cap 20"),
-         ("emt_f", "EMT, 1 auxiliary task (ANOVA F)"), ("emt_relief", "EMT, 1 auxiliary task (Relief-F)"),
+         ("emt_f", r"EMT, 1 auxiliary task (ANOVA $F$)"), ("emt_relief", "EMT, 1 auxiliary task (Relief-F)"),
          ("emt_min3", "EMT, 3 minority-aware tasks"), ("emt_min3_rl", r"EMT, 3 minority-aware tasks + UCB1"),
          ("emt_rand3", "EMT, 3 random tasks (control)"), ("H-top20", "Hellinger top-20 filter")]
 rows = []
@@ -224,7 +225,22 @@ for m, lab in BNAME:
         eq = r"$^{\approx}$" if r["equivalent"] else ""
         cells.append(f"{f3(r['mean'], True)}{mark}{eq}")
     rows.append(lab + " & " + " & ".join(cells) + r" \\")
+# rows added in review (run_extra.py, same folds): SVM-RFE, cost-sensitive SVM-RFE, Hellinger with F tie-break, no selection
+SX = J(f"{D}/summary_extra.json")
+XNAME = [("RFE", 20, "SVM-RFE"), ("RFEw", 20, "SVM-RFE, class-weighted"), ("Hf", 20, r"Hellinger, $F$ tie-break"),
+         ("ALL", 0, "All features (no selection)")]
+xrows = []
+for m, k, lab in XNAME:
+    cells = [f"{SX['extra_mean'][s][f'{m}|{k}|{cl}']:.3f}" for s in ("disc", "held") for cl in GR]
+    for cl in GR:
+        r = SX["extra_vsH"][f"{m}|20|{cl}"]["both|dataset"]
+        mark = r"$^{*}$" if r["p"] < 0.05 else ""
+        eq = r"$^{\approx}$" if r["equivalent"] else ""
+        cells.append(f"{f3(r['mean'], True)}{mark}{eq}")
+    xrows.append(lab + " & " + " & ".join(cells) + r" \\")
+rows = rows[:1] + [xrows[2]] + rows[1:-1] + [xrows[0], xrows[1], xrows[3], r"\midrule", rows[-1]]
 open(f"{OUT}/tables/base.tex", "w").write("\n".join(rows) + "\n")
+facts["extra"] = {k: SX[k] for k in ("extra_n", "ties", "extra_stab", "extra_time", "tie_worst")}
 facts["base"] = {k: SB[k] for k in ("n", "stab", "time")}
 
 # ---------------------------------------------------------------- Table: MF-CSO (re-implemented), repeats 0-1
@@ -262,8 +278,36 @@ if os.path.exists(f"{D}/summary_ssshd.json"):
     open(f"{OUT}/tables/ssshd.tex", "w").write("\n".join(rows) + "\n")
     facts["ssshd"] = {k: SS[k] for k in ("n", "stab", "time", "sel")}
 
+# ---------------------------------------------------------------- Table: further wrapper checks (run_wrap2.py)
+if SX.get("wrap2_n", {}).get("disc", 0) > 0:
+    W2N = [("bgwo_cap20-H20", "BGWO cap 20 $-$ \\Hel{}20"),
+           ("ga_cap20-H20", "GA cap 20 $-$ \\Hel{}20"),
+           ("ga_cap20-bgwo_cap20", "GA cap 20 $-$ BGWO cap 20"),
+           ("ga_nocap-bgwo_nocap", "GA no cap $-$ BGWO no cap"),
+           ("bgwo_cap20_x4-bgwo_cap20", "BGWO cap 20: $4\\times$ budget $-$ $1\\times$$^{\\dagger}$"),
+           ("bgwo_nocap_x4-bgwo_nocap", "BGWO no cap: $4\\times$ budget $-$ $1\\times$$^{\\dagger}$"),
+           ("bgwo_cap20_x4-H20", "BGWO cap 20, $4\\times$ budget $-$ \\Hel{}20$^{\\dagger}$"),
+           ("bgwoF_cap20-F20", "BGWO cap 20, $F$ pool $-$ $F$ top-20"),
+           ("bgwoF_cap20-H20", "BGWO cap 20, $F$ pool $-$ \\Hel{}20")]
+    rows = []
+    for key, lab in W2N:
+        cells = []
+        for s_ in ("disc", "held"):
+            for cl in GR:
+                r = SX["wrap2"][f"{key}|{cl}"].get(f"{s_}|dataset")
+                cells.append("--" if r is None else f"{f3(r['mean'], True)}{'$^{*}$' if r['p'] < 0.05 else ''}")
+        for cl in GR:
+            r = SX["wrap2"][f"{key}|{cl}"].get("both|family")
+            if r is None:
+                cells.append("--"); continue
+            mark = r"$^{*}$" if r["p"] < 0.05 else (r"$^{\approx}$" if r["equivalent"] else "")
+            cells.append(f"{f3(r['mean'], True)}{mark} ({r['wins']}/{r['losses']})")
+        rows.append(lab + " & " + " & ".join(cells) + r" \\")
+    open(f"{OUT}/tables/wrap2.tex", "w").write("\n".join(rows) + "\n")
+    facts["wrap2"] = {k: SX[k] for k in ("wrap2_n", "wrap2_size", "wrap2_stab", "seed_stab", "wrap2_time", "wrap2_mean")}
+
 # ---------------------------------------------------------------- Table: computational cost (if measured)
-TP = f"{D}/time_methods.json"
+TP = "/home/claude/hdi/time_methods.json"
 if os.path.exists(TP):
     TM = J(TP)
     sets = list(TM)
@@ -282,18 +326,20 @@ if os.path.exists(TP):
 
 # ---------------------------------------------------------------- Figure 1: forest plot
 DEP = J(f"{D}/summary_dep.json")
-LAB = {"cap20 - H20 (5-NN final)": "Wrapper cap 20 $-$ H top-20\n(5-NN, the fitness classifier)",
-       "cap20 - H20 (LR/SVM final)": "Wrapper cap 20 $-$ H top-20\n(LR and SVM)",
-       "ridge_cap20 - H20 (ridge/LR/SVM)": "Ridge wrapper cap 20 $-$ H top-20\n(ridge, LR, SVM)",
+LAB = {"cap20 - H20 (5-NN final)": "Wrapper cap 20 $-$ Hellinger top-20\n(5-NN, the fitness classifier)",
+       "cap20 - H20 (LR/SVM final)": "Wrapper cap 20 $-$ Hellinger top-20\n(LR and SVM)",
+       "ridge_cap20 - H20 (ridge/LR/SVM)": "Ridge wrapper cap 20 $-$ Hellinger\ntop-20 (ridge, LR, SVM)",
        "emt_min3 - cap20 (5-NN)": "EMT (3 minority-aware tasks)\n$-$ wrapper cap 20 (5-NN)",
        "bbrier - acc wrapper (5-NN, H pool)": "Balanced-Brier fitness $-$\naccuracy fitness (5-NN)",
        "SMOTE->FS - prior, G-mean": "SMOTE$\\to$FS $-$ prior threshold\n(G-mean)",
-       "SMOTE->FS - prior, MCC": "SMOTE$\\to$FS $-$ prior threshold\n(MCC)"}
+       "SMOTE->FS - prior, MCC": "SMOTE$\\to$FS $-$ prior threshold\n(MCC)",
+       "FS->SMOTE - prior, G-mean": "FS$\\to$SMOTE $-$ prior threshold\n(G-mean)",
+       "FS->SMOTE - prior, MCC": "FS$\\to$SMOTE $-$ prior threshold\n(MCC)"}
 SER = [("disc|dataset", "Discovery, 34 datasets", "#2a78d6", "o"), ("held|dataset", "Held-out, 18 datasets", "#eb6834", "s"),
        ("both|family", "Pooled, 38 families", "#1baf7a", "D")]
 keys = list(LAB)
 plt.rcParams.update({"font.size": 8.5, "font.family": "serif", "axes.edgecolor": "#52514e", "axes.linewidth": 0.6})
-fig, ax = plt.subplots(figsize=(6.3, 5.0))
+fig, ax = plt.subplots(figsize=(6.3, 6.2))
 ax.axvspan(-0.02, 0.02, color="#f0efec", zorder=0, lw=0)
 ax.axvline(0, color="#52514e", lw=0.8, zorder=1)
 for i, k in enumerate(keys):
@@ -335,3 +381,110 @@ facts["stab"] = {s: dict(zip([m for m, _ in SM], val[s])) for s in "DH"}
 
 json.dump(facts, open(f"{OUT}/facts.json", "w"), indent=1, default=float)
 print(json.dumps({k: v for k, v in facts.items() if k != "dep"}, indent=1, default=float))
+
+# ---------------------------------------------------------------- Supplementary tables from the review analyses
+if os.path.exists(f"{D}/summary_review.json"):
+    RV = J(f"{D}/summary_review.json")
+    MN = [("F", "ANOVA $F$"), ("L1", "L1-logistic"), ("EN", "Elastic net"), ("mRMR", "mRMR"),
+          ("RFimp", "RF impurity"), ("RFperm", "RF permutation"), ("cap20", "Wrapper, cap 20")]
+    G3 = ("knn", "lrsvm", "rf")
+    def mk(r):
+        return f"{f3(r['mean'], True)}{'$^{*}$' if r['p'] < 0.05 else ''}"
+    rows = []
+    for m, lab in MN:
+        cells = []
+        for q in ("gmean", "mcc", "aucpr"):
+            for g in G3:
+                key = f"cap20-H20|{q}|{g}" if m == "cap20" else f"{m}-H|{q}|{g}"
+                cells.append(mk(RV["components"][key]))
+        rows.append(lab + " & " + " & ".join(cells) + r" \\")
+    open(f"{OUT}/tables/supp_comp.tex", "w").write("\n".join(rows) + "\n")
+    rows = []
+    for m, lab in MN:
+        cells = []
+        for g in G3:
+            key = f"cap20-H20|{g}" if m == "cap20" else f"H-{m}|{g}"
+            r = RV["ir_moderation"][key]
+            sign = -1 if m == "cap20" else 1      # report every row as (Hellinger advantage) except the wrapper row
+            cells.append(f"{f3(r['spearman_all'], True)} ({r['p_spearman']:.2f}); {r['n_pos']}/{r['n_neg']}")
+        rows.append(lab + " & " + " & ".join(cells) + r" \\")
+    open(f"{OUT}/tables/supp_ir.tex", "w").write("\n".join(rows) + "\n")
+    rows = []
+    for k in (10, 20, 30, 40):
+        for m, lab in MN[:-1]:
+            cells = [f3(RV["text_tasks"]["diff"][f"{m}|{k}|{g}"]["mean"], True) for g in G3]
+            rows.append((f"{k}" if m == "F" else "") + f" & {lab} & " + " & ".join(cells) + r" \\")
+        if k != 40:
+            rows.append(r"\midrule")
+    open(f"{OUT}/tables/supp_text.tex", "w").write("\n".join(rows) + "\n")
+    facts["review"] = {"sizes": RV["sizes"], "threshold_auc": RV["threshold_auc"]}
+    json.dump(facts, open(f"{OUT}/facts.json", "w"), indent=1, default=float)
+
+# ---------------------------------------------------------------- cell shading of the comparison tables
+# Each numeric cell of tables/base.tex and tables/wrap2.tex is shaded by its difference from the reference
+# (Hellinger filter): blue = better, red = worse, white for |d| < 0.005, full tint at |d| >= 0.05.
+# Shading repeats the numbers; the * and ~ marks are kept so the tables also read in grey scale.
+import re as _re
+_NUM = _re.compile(r"^\s*(\$-\$|\+|-)?(\d+\.\d+)")
+POS, NEG, TINT, SAT = (0.13, 0.40, 0.67), (0.80, 0.18, 0.15), 0.45, 0.05
+
+
+def _val(c):
+    m = _NUM.match(c)
+    if not m:
+        return None
+    return (-1 if m.group(1) in ("$-$", "-") else 1) * float(m.group(2))
+
+
+def _shade(c, d):
+    if d is None or abs(d) < 0.005:
+        return c
+    a = TINT * min(abs(d) / SAT, 1.0)
+    rgb = ",".join(f"{1 - a * (1 - x):.3f}" for x in (POS if d > 0 else NEG))
+    return r"\cellcolor[rgb]{" + rgb + "}" + c.strip() + " "
+
+
+def _rows(path):
+    return open(path).read().rstrip("\n").split("\n")
+
+
+def _split(row):
+    return [c for c in row.rstrip().removesuffix(r"\\").split("&")]
+
+
+# wrapper row of Table base: its own Hellinger top-20 filter (results_cap / results_xclf), as in the caption
+def _own_h20():
+    out = []
+    for d in (D, H):
+        Cp, Xc = load(f"{d}/results_cap"), load(f"{d}/results_xclf")
+        names = sorted(Cp)
+        for cl in (("knn",), ("lr", "svm"), ("rf",)):
+            out.append(float(np.mean([np.mean([prim(Cp[n]["res"]["H20"]) if c == "knn" else prim(Xc[n]["res"][("H20", c)])
+                                               for c in cl]) for n in names])))
+    return out
+
+
+rows = _rows(f"{OUT}/tables/base.tex")
+ref = [_val(c) for c in _split(rows[0])[1:7]]
+own = _own_h20()
+out = []
+for r in rows:
+    if "&" not in r or r.startswith("Hellinger &"):
+        out.append(r); continue
+    c = _split(r)
+    base = own if c[0].startswith("Wrapper") else ref
+    c = [c[0]] + [_shade(x, None if _val(x) is None else _val(x) - base[i]) for i, x in enumerate(c[1:7])] + \
+        [_shade(x, _val(x)) for x in c[7:]]
+    out.append(" & ".join(x.strip() for x in c) + r" \\")
+open(f"{OUT}/tables/base.tex", "w").write("\n".join(out) + "\n")
+facts["own_h20"] = own
+
+if os.path.exists(f"{OUT}/tables/wrap2.tex"):
+    out = []
+    for r in _rows(f"{OUT}/tables/wrap2.tex"):
+        if "&" not in r:
+            out.append(r); continue
+        c = _split(r)
+        out.append(" & ".join([c[0].strip()] + [_shade(x, _val(x)).strip() for x in c[1:]]) + r" \\")
+    open(f"{OUT}/tables/wrap2.tex", "w").write("\n".join(out) + "\n")
+json.dump(facts, open(f"{OUT}/facts.json", "w"), indent=1, default=float)
